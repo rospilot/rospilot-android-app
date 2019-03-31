@@ -41,13 +41,13 @@ class H264ViewModel {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (!done.get()) {
-                    OkHttpClient client = new OkHttpClient.Builder()
-                            .readTimeout(500, TimeUnit.MILLISECONDS)
-                            .connectTimeout(500, TimeUnit.MILLISECONDS)
-                            .writeTimeout(500, TimeUnit.MILLISECONDS)
-                            .build();
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .readTimeout(500, TimeUnit.MILLISECONDS)
+                        .connectTimeout(500, TimeUnit.MILLISECONDS)
+                        .writeTimeout(500, TimeUnit.MILLISECONDS)
+                        .build();
 
+                while (!done.get()) {
                     List<Callback> callbacks;
                     synchronized (spsAndPPSRequests) {
                         callbacks = new ArrayList<>(spsAndPPSRequests);
