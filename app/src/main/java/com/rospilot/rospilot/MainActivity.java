@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 
 import com.vuzix.hud.actionmenu.ActionMenuActivity;
 
@@ -31,6 +32,7 @@ public class MainActivity extends ActionMenuActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         viewModel = new H264ViewModel(new H264ViewModel.Callback() {
             @Override
