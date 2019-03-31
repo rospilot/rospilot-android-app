@@ -20,6 +20,8 @@ class H264ViewModel {
         void callback(ByteBuffer packet);
     }
 
+    private final static String HOST = "10.0.0.1";
+
     private final AtomicBoolean done = new AtomicBoolean(false);
     private final Callback callback;
     private final List<Callback> spsAndPPSRequests = new LinkedList<>();
@@ -54,7 +56,7 @@ class H264ViewModel {
 
                     if (callbacks.size() > 0) {
                         Request request = new Request.Builder()
-                                .url("http://192.168.122.1:8666/h264_sps_pps")
+                                .url("http://" + HOST + ":8666/h264_sps_pps")
                                 .build();
 
                         Log.e("MainActivity", "Fetching metadata");
@@ -71,7 +73,7 @@ class H264ViewModel {
                     }
 
                     Request request = new Request.Builder()
-                        .url("http://192.168.122.1:8666/h264/1236")
+                        .url("http://" + HOST + ":8666/h264/1236")
                         .build();
 
                     Response response;
