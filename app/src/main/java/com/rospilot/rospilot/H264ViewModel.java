@@ -6,6 +6,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +21,7 @@ class H264ViewModel {
         void callback(ByteBuffer packet);
     }
 
-    private final static String HOST = "10.0.0.1";
+    private final static List<String> HOSTS = Arrays.asList("10.0.0.1", "odroid", "rospilot");
 
     private final AtomicBoolean done = new AtomicBoolean(false);
     private final Callback callback;
@@ -47,6 +48,33 @@ class H264ViewModel {
                         .writeTimeout(500, TimeUnit.MILLISECONDS)
                         .build();
 
+                // Try all the possible hosts until we find the server
+                String host = null;
+                while (host == null) {
+                    for (String candidate: HOSTS) {
+                        Request request = new Request.Builder()
+                                .url("http://" + candidate + ":8666/h264_sps_pps")
+                                .build();
+
+                        try {
+                            client.newCall(request).execute();
+                            host = candidate;
+                            break;
+                        } catch (IOException e) {
+                            // pass
+                        }
+                    }
+                    if (host == null) {
+                        Log.e("MainActivity", "Can't find server. Trying again in 1sec");
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                }
+                Log.e("MainActivity", "Discovered server: " + host);
+
                 while (!done.get()) {
                     List<Callback> callbacks;
                     synchronized (spsAndPPSRequests) {
@@ -56,7 +84,7 @@ class H264ViewModel {
 
                     if (callbacks.size() > 0) {
                         Request request = new Request.Builder()
-                                .url("http://" + HOST + ":8666/h264_sps_pps")
+                                .url("http://" + host + ":8666/h264_sps_pps")
                                 .build();
 
                         Log.e("MainActivity", "Fetching metadata");
@@ -73,7 +101,7 @@ class H264ViewModel {
                     }
 
                     Request request = new Request.Builder()
-                        .url("http://" + HOST + ":8666/h264/1236")
+                        .url("http://" + host + ":8666/h264/1236")
                         .build();
 
                     Response response;
